@@ -18,7 +18,7 @@ public class Arquivo {
 
     public String nome;
     public long tamanho;
-    private long tamanhoBloco;
+    public long tamanhoDisco;
     public Date dataCriacao;
     public int tipo;
     public String pathOrigem;
@@ -27,17 +27,20 @@ public class Arquivo {
     public Map nomesTipos;
     public boolean removido;
 
-    public Arquivo(String nome, long tamanho, Date dataCriacao, int tipo, String pathOrigem, Date dtModificacao, int posicaoInicial, int tamBloco) {
+    public Arquivo(String nome, long tamanho, Date dataCriacao, int tipo, String pathOrigem, Date dtModificacao, int posicaoInicial, int tamBloco, boolean removido) {
         this.nome = nome;
         this.tamanho = tamanho;
-        long tam = (this.tamanho / this.tamanhoBloco);
-        this.tamanhoBloco = this.tamanho % this.tamanhoBloco == 0 ? tam : tam + 1;
+
+        long qtBlocosUtilizados = (this.tamanho / tamBloco);
+        qtBlocosUtilizados = this.tamanho % tamBloco == 0 ? qtBlocosUtilizados : qtBlocosUtilizados + 1;
+        this.tamanhoDisco = qtBlocosUtilizados * tamBloco;
+        
         this.dataCriacao = dataCriacao;
         this.tipo = tipo;
         this.pathOrigem = pathOrigem;
         this.dataModificacao = dtModificacao;
         this.posicaoInicial = posicaoInicial;
-        this.removido = false;
+        this.removido = removido;
         
         this.nomesTipos = new HashMap<>();
         this.nomesTipos.put(1, "Texto");
@@ -59,7 +62,16 @@ public class Arquivo {
     public void Print() {
         String statusRemovido = this.removido ? "Sim" : "Não";
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        System.out.printf("%s:\n\tTipo: %s\n\tOrigem: %s\n\tPosição inicial: %d\n\tTamanho: %d bytes\n\tCriado em %s\n\tAlterado em %s\n\tRemovido: %s\n",
-                this.nome, this.nomesTipos.get(this.tipo), this.pathOrigem, this.posicaoInicial, this.tamanho, formato.format(this.dataCriacao), formato.format(this.dataModificacao), statusRemovido);
+        System.out.printf("%s:\n\tTipo: %s\n\tOrigem: %s\n\tPosição inicial: %d\n\tTamanho em disco: %d bytes.\n\tTamanho: %d bytes\n\tCriado em %s\n\tAlterado em %s\n\tRemovido: %s\n",
+                this.nome, this.nomesTipos.get(this.tipo), this.pathOrigem, this.posicaoInicial, this.tamanhoDisco, this.tamanho, formato.format(this.dataCriacao), formato.format(this.dataModificacao), statusRemovido);
+    }
+    
+    public void PrintSimples(){
+        System.out.printf("\t%s:\n", this.nome);
+    }
+    
+    public boolean Remover(){
+        this.removido = true;        
+        return this.removido;
     }
 }

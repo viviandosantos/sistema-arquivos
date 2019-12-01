@@ -20,19 +20,17 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         String root = "Fs.me";
-        int tamanhoBloco = 2;
+        String lixeira = "Fs.me.RecycleBin";
+        int tamanhoBloco = 30;
         File dir = new File(root);
+        File dirLixeira = new File(lixeira);
         Scanner s = new Scanner(System.in);
         String str;
-        /*
-        CRIAR:
-        Diretório de lixeira.
-        Quando o arquivo for eliminado do sistema de arquivos deverá ser enviado/criado na lixeira. 
-        Quando o usuário quiser retomar o arquivo, ele deverá ser excluido da lixeira e trazido de volta a "vida"
-        */        
-        System.out.print("Informe o tamanho em bytes do bloco: ");
-        tamanhoBloco = s.nextInt();
-        
+
+        System.out.println("Tamanho da unidade de bloco: " + tamanhoBloco + " bytes.\n");
+
+        //System.out.print("Informe o tamanho em bytes do bloco: ");
+        //tamanhoBloco = s.nextInt();
         if (!dir.exists()) {
             System.out.println("Criando diretório físico...");
             //criar pasta física principal para salvar os arquivos
@@ -42,59 +40,83 @@ public class Main {
                 System.out.println("ERRO: Falha ao criar diretório!");
             }
         }
-        
-        SistemaArquivos sistemaArq = new SistemaArquivos(root, dir, tamanhoBloco);
+        System.out.println("\n");
+        if (!dirLixeira.exists()) {
+            dirLixeira.mkdir();
+        }
+
+        SistemaArquivos sistemaArq = new SistemaArquivos(root, dir, tamanhoBloco, lixeira, dirLixeira);
         //ler arquivos criados numa execução anterior
         sistemaArq.ObterArquivos();
 
-        System.out.println(""
-                + "  <1> Criar Diretório\n" //estou com medo de criar esse role
-                + "**<2> Inserir novos arquivos\n"
-                + "  <3> Remover Arquivo\n" //li a parte de restaurar e estou em choque
-                + "**<4> Exibir conteudo de arquivo txt\n"
-                + "**<5> Listar arquivos\n"
-                + "* <6> Atualizar arquivo\n" //seria uma boa ter interface pra trazer o que já tem no arquivo e a pessoa editar. No console vai sobreescrever.
-                + "**<7> Listar info sistema de arquivos\n"
-                + "<0> Sair do programa");
+        System.out.print(""
+                + "<1> Exibir info sistema de arquivos\n"
+                + "<2> Inserir novos arquivos\n"
+                + "<3> Listar arquivos\n"
+                + "<4> Exibir conteudo de arquivo de texto\n"
+                + "<5> Remover Arquivo\n"
+                + "<6> Restaurar arquivo\n"
+                //+ "<7> Atualizar arquivo\n"
+                + "<0> Sair do programa\n"
+                + "Digite a opção desejada: ");
         int n = s.nextInt();
+        System.out.println("\n");
 
-        // while (n != 0) {
-        switch (n) {
-            case 1:
-                //dir.criarDiretorio();
-                break;
+        while (n != 0) {
+            switch (n) {
+                case 1:
+                    sistemaArq.Print();
+                    break;
 
-            case 2:
-                sistemaArq.InserirArquivo();
-                break;
+                case 2:
+                    sistemaArq.InserirArquivo();
+                    break;
 
-            case 3:
-                sistemaArq.RemoverArquivo();
-                break;
+                case 3:
+                    sistemaArq.ListarArquivos();
+                    break;
 
-            case 4:
-                System.out.print("Insira o nome do arquivo que deseja ler: ");
-                str = s.next();
-                sistemaArq.AbrirArquivo(str);
-                break;
-             
-            case 5:
-                sistemaArq.ListarArquivos();
-                break;
-                
-             case 6:
-                sistemaArq.AtualizarArquivo();
-                break;
-                 
-             case 7:
-                sistemaArq.Print();
-                break;
+                case 4:
+                    System.out.println("Arquivos: ");
+                    sistemaArq.ListarArquivosSimplificados();
+                    System.out.print("Insira o nome do arquivo que deseja ler: ");
+                    str = s.next();
+                    sistemaArq.AbrirArquivo(str);
+                    break;
 
-            case 0:
-                break;
+                case 5:
+                    sistemaArq.RemoverArquivo();
+                    break;
 
-            default:
-                break;
+                case 6:
+                    sistemaArq.RestaurarArquivo();
+                    break;
+
+//                case 7:
+//                    sistemaArq.AtualizarArquivo();
+//                    break;
+
+                case 0:
+                    break;
+
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
+            }
+            System.out.print("\n"
+                    + "<1> Exibir info sistema de arquivos\n"
+                    + "<2> Inserir novos arquivos\n"
+                    + "<3> Listar arquivos\n"
+                    + "<4> Exibir conteudo de arquivo de texto\n"
+                    + "<5> Remover Arquivo\n"
+                    + "<6> Restaurar arquivo\n"
+                    //+ "<7> Atualizar arquivo\n"
+                    + "<0> Sair do programa\n"
+                    + "Digite a opção desejada: ");
+            if(s.hasNext())
+                n = s.nextInt();
+            System.out.println("\n");
         }
+        s.close();
     }
 }
