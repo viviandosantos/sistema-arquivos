@@ -74,4 +74,9 @@ public class Arquivo {
         this.removido = true;        
         return this.removido;
     }
+    
+    public boolean Restaurar(){
+        this.removido = false;
+        return this.removido;
+    }
 }

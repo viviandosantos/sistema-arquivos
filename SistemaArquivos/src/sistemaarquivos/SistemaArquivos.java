@@ -69,7 +69,7 @@ public class SistemaArquivos {
     public boolean InserirArquivo() {
         try {
             Scanner st = new Scanner(System.in);
-            System.out.print("Insira o nome do novo arquivo: ");
+            System.out.print("Insira o nome do novo arquivo + extensão: ");
             String nomeArquivo = st.nextLine();
 
             File arquivoCriado = new File(this.raiz + "/" + nomeArquivo);
@@ -98,7 +98,10 @@ public class SistemaArquivos {
             Date agora = new Date();
             Arquivo novoArquivo = new Arquivo(nomeArquivo, arquivoCriado.length(), agora, tipoArquivo, this.raiz, agora, this.ultimaPosicao, this.tamanhoBloco, false);
 
-            this.ultimaPosicao += novoArquivo.tamanho;
+            long qtBlocosUtilizados = (novoArquivo.tamanho / this.tamanhoBloco);
+            qtBlocosUtilizados = novoArquivo.tamanho % this.tamanhoBloco == 0 ? qtBlocosUtilizados : qtBlocosUtilizados + 1;
+
+            this.ultimaPosicao += qtBlocosUtilizados + 1;
             this.header.AdicionarArquivo(novoArquivo);
             this.arquivos.add(novoArquivo);
 
@@ -117,7 +120,6 @@ public class SistemaArquivos {
     }
 
     public void ObterArquivos() {
-        //obter ultima posição disponível do header + quantidade de arquivos 
         int quantidadeArquivos = 0;
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         try {
@@ -135,7 +137,6 @@ public class SistemaArquivos {
                         boolean foiRemovido = infos[2].equals("|S|");
                         Arquivo arqLinha = new Arquivo(infos[0], file.length(), formato.parse(infos[3]), Integer.parseInt(infos[1]),
                                 file.getCanonicalPath(), this.header.ObterDataAlteracao(file), Integer.parseInt(infos[4]), this.tamanhoBloco, foiRemovido);
-                        //arqLinha.Print();
                         this.arquivos.add(arqLinha);
                     } catch (ParseException ex) {
                         Logger.getLogger(SistemaArquivos.class.getName()).log(Level.SEVERE, null, ex);
@@ -334,14 +335,18 @@ public class SistemaArquivos {
                 System.out.println("Arquivo não localizado na lixeira!");
             } else {
                 File arquivoRestaurado = new File(this.arquivo.getAbsolutePath() + "\\" + nomeArquivo);
-                //verificar se npa ha arquivo com o mesmo nome
                 if (!arquivoRestaurado.exists()) {
-                    Files.move(Paths.get(this.arquivoLixeira.getCanonicalPath() + "\\" + nomeArquivo), Paths.get(this.arquivo.getAbsolutePath() + "\\" + nomeArquivo));
-                    this.header.Atualizar();
-                    System.out.println("Arquivo restaurado com sucesso!");
+                    Predicate<Arquivo> porNome = arq -> arq.nome.equals(nomeArquivo);
+                    List<Arquivo> arquivosExcluidos = this.arquivos.stream().filter(porNome).collect(Collectors.toList());
+                    if (!arquivosExcluidos.isEmpty()) {
+                        Arquivo arq = arquivosExcluidos.get(0);
+                        arq.Restaurar();
+                        Files.move(Paths.get(this.arquivoLixeira.getCanonicalPath() + "\\" + nomeArquivo), Paths.get(this.arquivo.getAbsolutePath() + "\\" + nomeArquivo));
+                        this.header.Atualizar();
+                        System.out.println("Arquivo restaurado com sucesso!");
+                    }
                 } else {
                     System.out.printf("Já existe um arquivo com o nome %s no diretório %s.\n", nomeArquivo, this.arquivo.getAbsolutePath());
-                    //Files.move(Paths.get(this.arquivoLixeira.getCanonicalPath() + "\\" + nomeArquivo), Paths.get(this.arquivo.getAbsolutePath() + "\\" + nomeArquivo + "(1)"));
                 }
             }
         } catch (IOException ex) {

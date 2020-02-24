@@ -31,7 +31,6 @@ public class Cabecalho {
     public final String path;
     private int quantidadeArquivos;
     private File arquivo;
-    //public List<Arquivo> arquivos;
 
     public Cabecalho(String root) {
         String local = "";
@@ -43,7 +42,6 @@ public class Cabecalho {
 
         this.raiz = local + "/" + root;
         this.nomeArquivo = root + ".header.txt";
-        //this.arquivos = new ArrayList<>();
         this.path = this.raiz + "/" + this.nomeArquivo;
         this.arquivo = new File(this.path);
 
@@ -57,7 +55,6 @@ public class Cabecalho {
                 } catch (IOException ex) {
                     Logger.getLogger(Cabecalho.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                //this.arquivo.setReadOnly();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Cabecalho.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -83,14 +80,7 @@ public class Cabecalho {
         return true;
     }
 
-    public boolean RemoverArquivo(Arquivo arquivo) {
-
-        //PARA QUE A REMOÇÃO EM DISCO FUNCIONE ISSO PRECISA SER IMPLEMENTADO
-        return true;
-    }
-
     public void Print() {
-        //@1|VERSAO|DATACRIACAO|DATAMODIFICACAO|QTDEARUIVOS|TAMANHOCABECALHO	
         System.out.println("Quantidade de arquivos: " + this.quantidadeArquivos + ". Tamanho:" + this.arquivo.length() + " bytes. Data modificação: " + this.ObterDataAlteracaoFormatada(this.arquivo));
     }
 
@@ -100,7 +90,6 @@ public class Cabecalho {
 
     public void Atualizar() {
         this.quantidadeArquivos = 0;
-        //rever os tamanhos dos arquivos
         try {
             try (FileReader arq = new FileReader(this.path)) {
                 BufferedReader lerArq = new BufferedReader(arq);
@@ -118,7 +107,7 @@ public class Cabecalho {
                         this.quantidadeArquivos++;
                         rewrite = rewrite.concat(linha + "\n");
                     }
-                    linha = lerArq.readLine(); // lê da segunda até a última linha
+                    linha = lerArq.readLine(); 
                 }
 
                 FileWriter fw;
